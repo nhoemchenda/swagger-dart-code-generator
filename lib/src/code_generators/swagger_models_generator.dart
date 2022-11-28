@@ -821,6 +821,7 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
     List<String> requiredParameters,
     Map<String, SwaggerSchema> allClasses,
   ) {
+   
     final typeName = _generateListPropertyTypeName(
       allEnumListNames: allEnumListNames,
       allEnumNames: allEnumNames,
@@ -830,6 +831,7 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
       prop: prop,
       propertyName: propertyName,
     );
+     print("typeName: $typeName");
 
     final unknownEnumValue = generateEnumValue(
       allEnumNames: allEnumNames,
@@ -860,6 +862,9 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
     }
 
     var listPropertyName = 'List<$typeName>';
+    if(prop.type == kArray && !listPropertyName.endsWith('\$Item>')){
+      listPropertyName = typeName;
+    }
 
     listPropertyName = nullable(
         listPropertyName, className, requiredParameters, propertyKey, prop);
