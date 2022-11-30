@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:grammer/grammer.dart';
 import 'package:swagger_dart_code_generator/src/code_generators/constants.dart';
 import 'package:swagger_dart_code_generator/src/swagger_models/requests/swagger_request.dart';
 import 'package:swagger_dart_code_generator/src/swagger_models/requests/swagger_request_parameter.dart';
@@ -70,7 +71,60 @@ class SwaggerRoot {
       _$SwaggerRootFromJson(json);
 
   static final SwaggerRoot empty = SwaggerRoot.fromJson({});
+
+  void refactor() {
+    print("refactor: ");
+    components?.schemas.forEach((key, value) {
+      print('key : $key => value : ${value.toJson()}');
+    });
+    final additionalSchemas = <String, SwaggerSchema>{};
+    components?.schemas.forEach((key, value) {
+      components?.schemas[key] =
+          convertToRef(components!.schemas, additionalSchemas, value, key);
+    });
+    components?.schemas.addAll(additionalSchemas);
+    components?.schemas.forEach((key, value) {
+      print('key : $key => value : ${value.toJson()}');
+    });
+  }
+
+  SwaggerSchema convertToRef(
+      Map<String, SwaggerSchema> schemas,
+      Map<String, SwaggerSchema> additionalSchemas,
+      SwaggerSchema schema,
+      String preferedType,
+      {int level = 1}) {
+    //type object
+    if (schema.type == 'object' && schema.ref == '' && level > 1) {
+      schema.ref = '#/components/schemas/' + preferedType;
+      additionalSchemas.putIfAbsent(
+          preferedType,
+          () => SwaggerSchema(
+              properties: Map.from(schema.properties), type: 'object'));
+      schema.properties = <String, SwaggerSchema>{};
+      schema.type = '';
+    }
+    //type array
+    if (schema.type == 'array') {
+      if (schema.items != null) {
+        schema.items = convertToRef(
+            schemas, additionalSchemas, schema.items!, preferedType + 'Item',
+            level: level + 1);
+      }
+    }
+
+    if (schema.type == 'object') {
+      schema.properties.forEach((key, value) {
+        schema.properties[key] = convertToRef(
+            schemas, additionalSchemas, value, preferedType + capitalize(Grammer(key).toSingular()),
+            level: level + 1);
+      });
+    }
+    return schema;
+  }
 }
+
+String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
 Map<String, SwaggerRequestParameter> _mapSecurityDefinitions(
     Map<String, dynamic>? definitions) {

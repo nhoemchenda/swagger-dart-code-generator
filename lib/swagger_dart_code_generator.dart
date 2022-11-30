@@ -147,6 +147,7 @@ class SwaggerDartCodeGenerator implements Builder {
 
   @override
   Future<void> build(BuildStep buildStep) async {
+
     if (buildStep.inputId.path == additionalResultPath) {
       for (final url in options.inputUrls) {
         final fileNameWithExtension = getFileNameBase(url);
@@ -178,6 +179,7 @@ class SwaggerDartCodeGenerator implements Builder {
     }
 
     final SwaggerRoot parsed = SwaggerRoot.fromJson(contentMap);
+    parsed.refactor();
 
     final fileNameWithExtension = getFileNameBase(buildStep.inputId.path);
     final fileNameWithoutExtension = removeFileExtension(fileNameWithExtension);
