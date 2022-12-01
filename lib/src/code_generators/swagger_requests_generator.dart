@@ -152,7 +152,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         final method = Method((m) => m
           ..optionalParameters.addAll(parameters)
           ..docs.add(_getCommentsForMethod(
-            methodDescription: swaggerRequest.summary,
+            methodDescription: swaggerRequest.summary.isEmpty ? swaggerRequest.description : swaggerRequest.summary,
             parameters: swaggerRequest.parameters,
             componentsParameters: swaggerRoot.components?.parameters ?? {},
           ))
@@ -403,7 +403,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
 
     final formattedDescription = methodDescription.split('\n').join('\n///');
 
-    return ['///THis is comment lol$formattedDescription', ...parametersComments].where((String element) => element.isNotEmpty).join('\n');
+    return ['///$formattedDescription', ...parametersComments].where((String element) => element.isNotEmpty).join('\n');
   }
 
   String _createSummaryParameters(
@@ -616,11 +616,12 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
                   ..named = true
                   ..required = isRequired
                   ..type = Reference(
-                    isRequired ? 'List<int>' : 'List<int>?',
+                    // isRequired ? 'List<int>' : 'List<int>?',
+                    isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
                   )
                   ..named = true
                   ..annotations.add(
-                    refer(kPartFile.pascalCase).call([]),
+                    refer(kPartFileMap.pascalCase).call([]),
                   ),
               ),
             );

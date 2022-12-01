@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:grammer/grammer.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:swagger_dart_code_generator/src/code_generators/constants.dart';
 import 'package:swagger_dart_code_generator/src/swagger_models/requests/swagger_request.dart';
 import 'package:swagger_dart_code_generator/src/swagger_models/requests/swagger_request_parameter.dart';
@@ -9,7 +10,6 @@ import 'package:swagger_dart_code_generator/src/swagger_models/swagger_component
 import 'package:swagger_dart_code_generator/src/swagger_models/swagger_info.dart';
 import 'package:swagger_dart_code_generator/src/swagger_models/swagger_path.dart';
 import 'package:swagger_dart_code_generator/src/swagger_models/swagger_tag.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 part 'swagger_root.g2.dart';
 
@@ -64,60 +64,38 @@ class SwaggerRoot {
 
   Map<String, dynamic> toJson() => _$SwaggerRootToJson(this);
 
-  factory SwaggerRoot.parse(String encodedJson) =>
-      SwaggerRoot.fromJson(jsonDecode(encodedJson) as Map<String, dynamic>);
+  factory SwaggerRoot.parse(String encodedJson) => SwaggerRoot.fromJson(jsonDecode(encodedJson) as Map<String, dynamic>);
 
-  factory SwaggerRoot.fromJson(Map<String, dynamic> json) =>
-      _$SwaggerRootFromJson(json);
+  factory SwaggerRoot.fromJson(Map<String, dynamic> json) => _$SwaggerRootFromJson(json);
 
   static final SwaggerRoot empty = SwaggerRoot.fromJson({});
 
   void refactor() {
-    print("refactor: ");
-    components?.schemas.forEach((key, value) {
-      print('key : $key => value : ${value.toJson()}');
-    });
     final additionalSchemas = <String, SwaggerSchema>{};
     components?.schemas.forEach((key, value) {
-      components?.schemas[key] =
-          convertToRef(components!.schemas, additionalSchemas, value, key);
+      components?.schemas[key] = convertToRef(components!.schemas, additionalSchemas, value, key);
     });
     components?.schemas.addAll(additionalSchemas);
-    components?.schemas.forEach((key, value) {
-      print('key : $key => value : ${value.toJson()}');
-    });
   }
 
-  SwaggerSchema convertToRef(
-      Map<String, SwaggerSchema> schemas,
-      Map<String, SwaggerSchema> additionalSchemas,
-      SwaggerSchema schema,
-      String preferedType,
-      {int level = 1}) {
+  SwaggerSchema convertToRef(Map<String, SwaggerSchema> schemas, Map<String, SwaggerSchema> additionalSchemas, SwaggerSchema schema, String preferedType, {int level = 1}) {
     //type object
     if (schema.type == 'object' && schema.ref == '' && level > 1) {
       schema.ref = '#/components/schemas/' + preferedType;
-      additionalSchemas.putIfAbsent(
-          preferedType,
-          () => SwaggerSchema(
-              properties: Map.from(schema.properties), type: 'object'));
+      additionalSchemas.putIfAbsent(preferedType, () => SwaggerSchema(properties: Map.from(schema.properties), type: 'object'));
       schema.properties = <String, SwaggerSchema>{};
       schema.type = '';
     }
     //type array
     if (schema.type == 'array') {
       if (schema.items != null) {
-        schema.items = convertToRef(
-            schemas, additionalSchemas, schema.items!, preferedType + 'Item',
-            level: level + 1);
+        schema.items = convertToRef(schemas, additionalSchemas, schema.items!, preferedType + 'Item', level: level + 1);
       }
     }
 
     if (schema.type == 'object') {
       schema.properties.forEach((key, value) {
-        schema.properties[key] = convertToRef(
-            schemas, additionalSchemas, value, preferedType + capitalize(Grammer(key).toSingular()),
-            level: level + 1);
+        schema.properties[key] = convertToRef(schemas, additionalSchemas, value, preferedType + capitalize(Grammer(key).toSingular()), level: level + 1);
       });
     }
     return schema;
@@ -126,8 +104,7 @@ class SwaggerRoot {
 
 String capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 
-Map<String, SwaggerRequestParameter> _mapSecurityDefinitions(
-    Map<String, dynamic>? definitions) {
+Map<String, SwaggerRequestParameter> _mapSecurityDefinitions(Map<String, dynamic>? definitions) {
   if (definitions == null) {
     return {};
   }
@@ -149,17 +126,12 @@ Map<String, SwaggerPath> _mapPaths(Map<String, dynamic>? paths) {
   return paths.map((path, pathValue) {
     final value = pathValue as Map<String, dynamic>;
     final parameters = value['parameters'] as List<dynamic>?;
-    value.removeWhere(
-        (key, value) => !supportedRequestTypes.contains(key.toLowerCase()));
+    value.removeWhere((key, value) => !supportedRequestTypes.contains(key.toLowerCase()));
 
     return MapEntry(
       path,
       SwaggerPath(
-        parameters: parameters
-                ?.map((parameter) => SwaggerRequestParameter.fromJson(
-                    parameter as Map<String, dynamic>))
-                .toList() ??
-            [],
+        parameters: parameters?.map((parameter) => SwaggerRequestParameter.fromJson(parameter as Map<String, dynamic>)).toList() ?? [],
         requests: value.map(
           (key, request) => MapEntry(
             key,
