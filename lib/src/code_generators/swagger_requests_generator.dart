@@ -591,7 +591,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
               ..annotations.add(
                 _getParameterAnnotation(swaggerParameter),
               )
-              ..defaultTo = _getHeaderDefaultValue(swaggerParameter),
+              ..defaultTo = _getHeaderDefaultValue(swaggerParameter) ?? (swaggerParameter.schema?.defaultValue == null ? null : Code("${swaggerParameter.schema?.type == "string" ? "'${swaggerParameter.schema?.defaultValue?.toString()}'" : "${swaggerParameter.schema?.defaultValue?.toString()}"}")),
           ),
         )
         .toList();
