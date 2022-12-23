@@ -84,7 +84,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         ..optionalParameters.add(Parameter(
           (p) => p
             ..named = true
-            ..type = Reference('String?')
+            ..type = Reference('Uri?')
             ..name = 'baseUrl',
         ))
         ..optionalParameters.add(Parameter(
@@ -143,7 +143,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
 
         final returns = returnTypeName.isEmpty ? kFutureResponse : returnTypeName.asFutureResponse();
 
-        final hasOptionalBody = ['post', 'put', 'patch'].contains(requestType) && swaggerRequest.parameters.none((p) => p.inParameter == kBody) && swaggerRequest.requestBody == null;
+        final hasOptionalBody = ['post', 'put', 'patch'].contains(requestType) && swaggerRequest.parameters.none((p) => p.inParameter == kBody) ;
 
         final isMultipart = parameters.any((p) {
           return p.annotations.any((p0) => p0.call([]).toString().contains('symbol=PartFile'));
@@ -233,10 +233,12 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
           final itemType = getValidatedClassName(ref.getUnformattedRef());
           results.add(itemType);
         } else {
-          final itemsType = schema?.items?.type;
+          final itemsType = schema?.items?.type ?? '';
 
-          if (!kBasicTypes.contains(itemsType) && schema?.items?.properties != null) {
-            final itemClassName = '$response\$Item';
+          if (!kBasicTypes.contains(itemsType) &&itemsType != 'object' &&
+              schema?.items?.properties != null &&
+              !itemsType.startsWith('List<')) {
+            final itemClassName = '$itemsType\$Item';
 
             results.add(itemClassName);
           }
@@ -665,7 +667,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
       final schema = requestBody.content?.schema;
 
       if (schema != null) {
-        if (schema.format == kBinary) {
+        if (schema.format == kBinary || schema.oneOf.isNotEmpty) {
           typeName = kObject.pascalCase;
         } else if (schema.items?.type.isNotEmpty == true) {
           typeName = _mapParameterName(schema.items!.type, schema.items!.format, options.modelPostfix).asList();
@@ -679,23 +681,22 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         }
       }
 
-      if (typeName.isNotEmpty) {
-        result.add(
-          Parameter(
-            (p) => p
-              ..name = kBody
-              ..named = true
-              ..required = true
-              ..type = Reference(
-                typeName.makeNullable(),
-              )
-              ..named = true
-              ..annotations.add(
-                refer(kBody.pascalCase).call([]),
-              ),
-          ),
-        );
-      }
+      result.add(
+        Parameter(
+          (p) => p
+            ..name = kBody
+            ..named = true
+            ..required = true
+            ..type = Reference(
+              (typeName.isNotEmpty ? typeName : kObject.pascalCase)
+                  .makeNullable(),
+            )
+            ..named = true
+            ..annotations.add(
+              refer(kBody.pascalCase).call([]),
+            ),
+        ),
+      );
     }
 
     return result.distinctParameters();
@@ -1033,7 +1034,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
     String host,
     String basePath,
   ) {
-    final baseUrlString = options.withBaseUrl ? "baseUrl:  baseUrl ?? 'http://$host$basePath'" : '/*baseUrl: YOUR_BASE_URL*/';
+    final baseUrlString = options.withBaseUrl ? "baseUrl:  baseUrl ?? Uri.parse('http://$host$basePath')" : '/*baseUrl: YOUR_BASE_URL*/';
 
     final converterString = options.withConverter ? 'converter: \$JsonSerializableConverter(),' : 'converter: chopper.JsonConverter(),';
 

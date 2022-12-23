@@ -1,4 +1,24 @@
+# 2.9.0
+
+* Fixed generation of nullable model properties ([#522](https://github.com/epam-cross-platform-lab/swagger-dart-code-generator/issues/522))
+
+# 2.9.0
+
+* Fixed generation of @OptionalBody annotations ([#509](https://github.com/epam-cross-platform-lab/swagger-dart-code-generator/issues/509))
+* Fixed generation of nullable model properties ([#506](https://github.com/epam-cross-platform-lab/swagger-dart-code-generator/issues/506))
+* ***Breaking*** Changed String path to Uri in Chopper lib ([#515](https://github.com/epam-cross-platform-lab/swagger-dart-code-generator/issues/515))
+
+# 2.8.9
+
+* Fixed generation of request bodies and defined lists types
+
+# 2.8.8
+
+* Fixed generation of some List models
+
 # 2.8.7
+
+* Fixed generation `allOf` properties with just properties ([#507](https://github.com/epam-cross-platform-lab/swagger-dart-code-generator/issues/507))
 
 * Fixed generation of basic types refs and lists of them ([#502](https://github.com/epam-cross-platform-lab/swagger-dart-code-generator/issues/502))
 

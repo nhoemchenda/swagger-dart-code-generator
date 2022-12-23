@@ -684,6 +684,12 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
     typeName =
         nullable(typeName, className, requiredProperties, propertyKey, prop);
 
+    final propertySchema = allClasses[prop.ref.getUnformattedRef()];
+
+    if (propertySchema?.isNullable == true) {
+      typeName = typeName.makeNullable();
+    }
+
     if (options.classesWithNullabeLists.contains(className) &&
         typeName.startsWith('List<') &&
         !typeName.endsWith('?')) {
@@ -1018,7 +1024,7 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
     if (propertiesMap.isEmpty) {
       return '';
     }
-
+    
     final results = <String>[];
     final propertyNames = <String>[];
 
@@ -1036,7 +1042,6 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
       propertyName = getParameterName(propertyName, propertyNames);
 
       propertyNames.add(propertyName);
-
       if (prop.type.isNotEmpty) {
         results.add(generatePropertyContentByType(
           prop,
@@ -1100,8 +1105,7 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
     return results.join('\n');
   }
 
-  static Map<String, String> generateBasicTypesMapFromSchemas(
-      SwaggerRoot root) {
+  Map<String, String> generateBasicTypesMapFromSchemas(SwaggerRoot root) {
     final result = <String, String>{};
 
     final components = root.components;
@@ -1134,6 +1138,8 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
 
           if (kBasicTypes.contains(schema?.type)) {
             typeName = _mapBasicTypeToDartType(schema!.type, value.format);
+          } else {
+            typeName = getValidatedClassName(typeName);
           }
 
           result[key] = typeName.asList();
@@ -1310,6 +1316,7 @@ List<enums.$neededName>? ${neededName.camelCase}NullableListFromJson(
     Map<String, SwaggerSchema> allClasses,
   ) {
     final properties = getModelProperties(schema, schemas, allClasses);
+
     final requiredProperties = _getRequired(schema, schemas);
 
     final generatedConstructorProperties = generateConstructorPropertiesContent(
@@ -1539,7 +1546,9 @@ $allHashComponents;
 
     final newModelMap = allOf.firstWhereOrNull((m) => m.properties.isNotEmpty);
 
-    final currentProperties = newModelMap?.properties ?? {};
+    final currentProperties = schema.properties;
+
+    currentProperties.addAll(newModelMap?.properties ?? {});
 
     final refs = allOf.where((element) => element.ref.isNotEmpty).toList();
     for (var allOf in refs) {
@@ -1628,6 +1637,12 @@ $allHashComponents;
           final allOfModel = schemas[ref.getUnformattedRef()];
 
           final allOfModelProperties = allOfModel?.properties ?? {};
+
+          if (allOfModel?.allOf.isNotEmpty == true) {
+            for (var element in allOfModel?.allOf ?? <SwaggerSchema>[]) {
+              properties.addAll(element.properties);
+            }
+          }
 
           properties.addAll(allOfModelProperties);
         }
