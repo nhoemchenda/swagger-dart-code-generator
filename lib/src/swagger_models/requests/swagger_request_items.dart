@@ -8,6 +8,7 @@ class SwaggerRequestItems {
     required this.type,
     required this.enumValues,
     required this.ref,
+    this.format,
   });
 
   @JsonKey(name: 'type', defaultValue: '')
@@ -19,10 +20,12 @@ class SwaggerRequestItems {
   @JsonKey(name: '\$ref', defaultValue: '')
   String ref;
 
+  @JsonKey(name: "format", defaultValue: '')
+  String? format;
+
   bool get hasRef => ref.isNotEmpty;
 
   Map<String, dynamic> toJson() => _$SwaggerRequestItemsToJson(this);
 
-  factory SwaggerRequestItems.fromJson(Map<String, dynamic> json) =>
-      _$SwaggerRequestItemsFromJson(json);
+  factory SwaggerRequestItems.fromJson(Map<String, dynamic> json) => _$SwaggerRequestItemsFromJson(json);
 }

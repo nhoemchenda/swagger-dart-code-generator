@@ -781,7 +781,6 @@ static $returnType $fromJsonFunction($valueType? value) => $enumNameCamelCase$fr
       prop: prop,
       propertyName: propertyName,
     );
-    print("typeName: $typeName");
 
     final unknownEnumValue = generateEnumValue(
       allEnumNames: allEnumNames,

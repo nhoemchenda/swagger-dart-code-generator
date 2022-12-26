@@ -571,6 +571,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         .where((swaggerParameter) => ignoreHeaders ? swaggerParameter.inParameter != kHeader : true)
         .where((swaggerParameter) => swaggerParameter.inParameter != kCookie)
         .where((swaggerParameter) => swaggerParameter.inParameter.isNotEmpty)
+        .where((swaggerParameter) => swaggerParameter.inParameter != kFormData)
         .map(
           (swaggerParameter) => Parameter(
             (p) => p
@@ -591,10 +592,29 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
               ..annotations.add(
                 _getParameterAnnotation(swaggerParameter),
               )
-              ..defaultTo = _getHeaderDefaultValue(swaggerParameter) ?? (swaggerParameter.schema?.defaultValue == null ? null : Code("${swaggerParameter.schema?.type == "string" ? "'${swaggerParameter.schema?.defaultValue?.toString()}'" : "${swaggerParameter.schema?.defaultValue?.toString()}"}")),
+              ..defaultTo = _getHeaderDefaultValue(swaggerParameter) ?? (swaggerParameter.schema?.defaultValue == null ? null : Code(swaggerParameter.schema?.type == "string" ? "'${swaggerParameter.schema?.defaultValue?.toString()}'" : "${swaggerParameter.schema?.defaultValue?.toString()}")),
           ),
         )
         .toList();
+
+    //Kyuthanea: Version 2.0 BS
+    parameters.where((swaggerParameter) => swaggerParameter.inParameter == kFormData).forEach((swaggerParameter) {
+      result.add(
+        Parameter(
+          (p) => p
+            ..name = swaggerParameter.name
+            ..named = true
+            ..required = true
+            ..type = Reference(
+                // isRequired ? 'List<int>' : 'List<int>?',
+                // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
+                'List<PartValueFile>')
+            ..annotations.add(
+              refer(kPartFileMap.pascalCase).call([]),
+            ),
+        ),
+      );
+    });
 
     final requestBody = swaggerRequest.requestBody;
 
@@ -614,12 +634,11 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
                 (p) => p
                   ..name = key
                   ..named = true
-                  ..required = isRequired
+                  ..required = true
                   ..type = Reference(
-                    // isRequired ? 'List<int>' : 'List<int>?',
-                    isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
-                  )
-                  ..named = true
+                      // isRequired ? 'List<int>' : 'List<int>?',
+                      // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
+                      'List<PartValueFile>')
                   ..annotations.add(
                     refer(kPartFileMap.pascalCase).call([]),
                   ),

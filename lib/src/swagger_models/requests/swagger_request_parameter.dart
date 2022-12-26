@@ -7,18 +7,19 @@ part 'swagger_request_parameter.g2.dart';
 
 @JsonSerializable()
 class SwaggerRequestParameter {
-  SwaggerRequestParameter(
-      {this.inParameter = '',
-      this.name = '',
-      this.description = '',
-      this.isRequired = false,
-      this.type = '',
-      this.item,
-      this.collectionFormat = '',
-      this.items,
-      this.schema,
-      this.ref = '',
-      this.key = ''});
+  SwaggerRequestParameter({
+    this.inParameter = '',
+    this.name = '',
+    this.description = '',
+    this.isRequired = false,
+    this.type = '',
+    this.item,
+    this.collectionFormat = '',
+    this.items,
+    this.schema,
+    this.ref = '',
+    this.key = '',
+  });
 
   @JsonKey(name: 'in', defaultValue: '')
   String inParameter;
@@ -55,6 +56,5 @@ class SwaggerRequestParameter {
 
   Map<String, dynamic> toJson() => _$SwaggerRequestParameterToJson(this);
 
-  factory SwaggerRequestParameter.fromJson(Map<String, dynamic> json) =>
-      _$SwaggerRequestParameterFromJson(json);
+  factory SwaggerRequestParameter.fromJson(Map<String, dynamic> json) => _$SwaggerRequestParameterFromJson(json);
 }
