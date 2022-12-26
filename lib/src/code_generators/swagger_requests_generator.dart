@@ -143,7 +143,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
 
         final returns = returnTypeName.isEmpty ? kFutureResponse : returnTypeName.asFutureResponse();
 
-        final hasOptionalBody = ['post', 'put', 'patch'].contains(requestType) && swaggerRequest.parameters.none((p) => p.inParameter == kBody) ;
+        final hasOptionalBody = ['post', 'put', 'patch'].contains(requestType) && swaggerRequest.parameters.none((p) => p.inParameter == kBody);
 
         final isMultipart = parameters.any((p) {
           return p.annotations.any((p0) => p0.call([]).toString().contains('symbol=PartFile'));
@@ -235,9 +235,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         } else {
           final itemsType = schema?.items?.type ?? '';
 
-          if (!kBasicTypes.contains(itemsType) &&itemsType != 'object' &&
-              schema?.items?.properties != null &&
-              !itemsType.startsWith('List<')) {
+          if (!kBasicTypes.contains(itemsType) && itemsType != 'object' && schema?.items?.properties != null && !itemsType.startsWith('List<')) {
             final itemClassName = '$itemsType\$Item';
 
             results.add(itemClassName);
@@ -688,8 +686,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
             ..named = true
             ..required = true
             ..type = Reference(
-              (typeName.isNotEmpty ? typeName : kObject.pascalCase)
-                  .makeNullable(),
+              (typeName.isNotEmpty ? typeName : kObject.pascalCase).makeNullable(),
             )
             ..named = true
             ..annotations.add(
