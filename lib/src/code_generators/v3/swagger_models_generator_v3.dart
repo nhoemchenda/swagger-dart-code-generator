@@ -27,8 +27,7 @@ class SwaggerModelsGeneratorV3 extends SwaggerModelsGenerator {
 
     var result = <String, SwaggerSchema>{};
 
-    final allModelNames =
-        components.schemas.keys.map((e) => getValidatedClassName(e));
+    final allModelNames = components.schemas.keys.map((e) => getValidatedClassName(e));
 
     for (var key in responses.keys) {
       if (!allModelNames.contains(key)) {
@@ -48,16 +47,13 @@ class SwaggerModelsGeneratorV3 extends SwaggerModelsGenerator {
     final components = root.components;
     final requestBodies = components?.requestBodies ?? {};
 
-    requestBodies.addAll(getRequestBodiesFromRequests(root));
-
     if (requestBodies.isEmpty) {
       return '';
     }
 
     var result = <String, SwaggerSchema>{};
 
-    final allModelNames =
-        components?.schemas.keys.map((e) => getValidatedClassName(e)) ?? [];
+    final allModelNames = components?.schemas.keys.map((e) => getValidatedClassName(e)) ?? [];
 
     for (var key in requestBodies.keys) {
       if (!allModelNames.contains(key)) {

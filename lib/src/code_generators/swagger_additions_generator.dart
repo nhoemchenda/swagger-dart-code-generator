@@ -17,10 +17,7 @@ class SwaggerAdditionsGenerator extends SwaggerGeneratorBase {
   String generateIndexes(List<String> fileNames) {
     final importsList = fileNames.map((key) {
       final actualFileName = getFileNameBase(key);
-      final fileName = actualFileName
-          .replaceAll('-', '_')
-          .replaceAll('.json', '.swagger')
-          .replaceAll('.yaml', '.swagger');
+      final fileName = actualFileName.replaceAll('-', '_').replaceAll('.json', '.swagger').replaceAll('.yaml', '.swagger');
       final className = getClassNameFromFileName(actualFileName);
 
       return 'export \'$fileName.dart\' show $className;';
@@ -46,12 +43,9 @@ class SwaggerAdditionsGenerator extends SwaggerGeneratorBase {
   ) {
     final result = StringBuffer();
 
-    final chopperPartImport =
-        buildOnlyModels ? '' : "part '$swaggerFileName.swagger.chopper.dart';";
+    final chopperPartImport = buildOnlyModels ? '' : "part '$swaggerFileName.swagger.chopper.dart';";
 
-    final overridenModels = options.overridenModels.isEmpty
-        ? ''
-        : 'import \'overriden_models.dart\';';
+    final overridenModels = options.overridenModels.isEmpty ? '' : 'import \'overriden_models.dart\';';
 
     final chopperImports = buildOnlyModels
         ? ''
@@ -61,12 +55,9 @@ import 'client_mapping.dart';
 import 'dart:async';
 import 'package:chopper/chopper.dart' as chopper;''';
 
-    final enumsImport = hasEnums
-        ? "import '$swaggerFileName.enums.swagger.dart' as enums;"
-        : '';
+    final enumsImport = hasEnums ? "import '$swaggerFileName.enums.swagger.dart' as enums;" : '';
 
-    final enumsExport =
-        hasEnums ? "export '$swaggerFileName.enums.swagger.dart';" : '';
+    final enumsExport = hasEnums ? "export '$swaggerFileName.enums.swagger.dart';" : '';
 
     if (hasModels && !separateModels) {
       result.writeln("""
@@ -74,6 +65,7 @@ import 'package:chopper/chopper.dart' as chopper;''';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:collection/collection.dart';
+import 'package:http/http.dart' show MultipartFile;
 ${options.overrideToString ? "import 'dart:convert';" : ''}
 """);
     }

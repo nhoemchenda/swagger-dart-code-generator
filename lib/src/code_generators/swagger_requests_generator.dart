@@ -146,7 +146,9 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         final hasOptionalBody = ['post', 'put', 'patch'].contains(requestType) && swaggerRequest.parameters.none((p) => p.inParameter == kBody);
 
         final isMultipart = parameters.any((p) {
-          return p.annotations.any((p0) => p0.call([]).toString().contains('symbol=PartFile'));
+          return p.annotations.any((p0) {
+            return p0.call([]).toString().contains('symbol=Part');
+          });
         });
 
         final method = Method((m) => m
@@ -165,6 +167,8 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
           swaggerRequest,
           returnTypeName,
         );
+
+        // print("DDD: ${parameters.join("--")}");
 
         final privateMethod = _getPrivateMethod(method);
         final publicMethod = _getPublicMethod(method, allModels);
@@ -627,8 +631,11 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         }
 
         schema?.properties.forEach((key, value) {
+          // print("DDD: ${value.type}");
+          // print("DDD: ${value.format}");
+          // print("DDD: ${value.properties}");
+
           if (value.type == 'string' && value.format == 'binary') {
-            final isRequired = schema!.required.contains(key);
             result.add(
               Parameter(
                 (p) => p
@@ -645,19 +652,17 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
               ),
             );
           } else {
-            final typeName = requestBody.content?.schema?.ref.isNotEmpty == true ? getValidatedClassName(requestBody.content!.schema!.ref.getRef()) : _mapParameterName(value.type, value.format, modelPostfix);
+            final typeName = kBasicTypesMap[value.type] ?? "List<MultipartFile>"; //requestBody.content?.schema?.ref.isNotEmpty == true ? getValidatedClassName(requestBody.content!.schema!.ref.getRef()) : _mapParameterName(value.type, value.format, modelPostfix);
 
             result.add(
               Parameter(
                 (p) => p
                   ..name = SwaggerModelsGenerator.getValidatedParameterName(key)
                   ..named = true
-                  ..required = schema!.required.contains(key)
-                  ..type = Reference(typeName.makeNullable())
-                  ..named = true
-                  ..annotations.add(
-                    refer(kPart.pascalCase).call([]),
-                  ),
+                  ..required = true
+                  ..type = Reference(typeName)
+                  ..annotations.add(Reference("Part('$key')"))
+                  ..named = true,
               ),
             );
           }
