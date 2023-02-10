@@ -612,7 +612,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
             ..type = Reference(
                 // isRequired ? 'List<int>' : 'List<int>?',
                 // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
-                'List<PartValueFile>')
+                'List<MultipartFile>')
             ..annotations.add(
               refer(kPartFileMap.pascalCase).call([]),
             ),
@@ -645,7 +645,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
                   ..type = Reference(
                       // isRequired ? 'List<int>' : 'List<int>?',
                       // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
-                      'List<PartValueFile>')
+                      'List<MultipartFile>')
                   ..annotations.add(
                     refer(kPartFileMap.pascalCase).call([]),
                   ),
