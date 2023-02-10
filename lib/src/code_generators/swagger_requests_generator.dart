@@ -603,6 +603,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
 
     //Kyuthanea: Version 2.0 BS
     parameters.where((swaggerParameter) => swaggerParameter.inParameter == kFormData).forEach((swaggerParameter) {
+      print("swaggerParameter.type ${swaggerParameter.type}");
       result.add(
         Parameter(
           (p) => p
@@ -613,7 +614,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
                 // isRequired ? 'List<int>' : 'List<int>?',
                 // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
                 'List<MultipartFile>')
-            ..annotations.add(Reference("Part('${swaggerParameter.name}')")),
+            ..annotations.add(Reference("Part('${swaggerParameter.name}${swaggerParameter.type == "array" ? '[]' : ''}')")),
         ),
       );
     });
