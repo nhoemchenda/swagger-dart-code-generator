@@ -613,9 +613,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
                 // isRequired ? 'List<int>' : 'List<int>?',
                 // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
                 'List<MultipartFile>')
-            ..annotations.add(
-              refer(kPartFileMap.pascalCase).call([]),
-            ),
+            ..annotations.add(Reference("Part('${swaggerParameter.name}')")),
         ),
       );
     });
@@ -631,10 +629,6 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         }
 
         schema?.properties.forEach((key, value) {
-          // print("DDD: ${value.type}");
-          // print("DDD: ${value.format}");
-          // print("DDD: ${value.properties}");
-
           if (value.type == 'string' && value.format == 'binary') {
             result.add(
               Parameter(
@@ -646,9 +640,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
                       // isRequired ? 'List<int>' : 'List<int>?',
                       // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
                       'List<MultipartFile>')
-                  ..annotations.add(
-                    refer(kPartFileMap.pascalCase).call([]),
-                  ),
+                  ..annotations.add(Reference("Part('$key')")),
               ),
             );
           } else {
