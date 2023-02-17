@@ -104,7 +104,7 @@ abstract class SwaggerModelsGenerator extends SwaggerGeneratorBase {
           allClasses,
         );
 
-        return 'typedef $className = List<$itemClassName>; $resultClass';
+        return 'typedef $className = $itemClassName; $resultClass';
       }
 
       return 'typedef $className = List<Object>;';

@@ -277,7 +277,6 @@ $dateToJson
   }
 
   Future<void> _generateAdditionalFiles(AssetId inputId, BuildStep buildStep, bool hasModels, List<String> allFiles) async {
-    print("_generateAdditionalFiles ${allFiles.join(",")}");
     final codeGenerator = SwaggerCodeGenerator();
 
     final indexAssetId = AssetId(inputId.package, join(options.outputFolder, _indexFileName));
