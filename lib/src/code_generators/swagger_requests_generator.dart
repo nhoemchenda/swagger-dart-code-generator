@@ -603,8 +603,9 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
 
     //Kyuthanea: Version 2.0 BS
     parameters.where((swaggerParameter) => swaggerParameter.inParameter == kFormData).forEach((swaggerParameter) {
-      // print("swaggerParameter.type ${swaggerParameter.type}");
-      if (swaggerParameter.type == "file") {
+      // print("swaggerParameter.type ${swaggerParameter.items?.toJson()}");
+
+      if (swaggerParameter.type == "file" || swaggerParameter.items?.format == 'binary') {
         result.add(
           Parameter(
             (p) => p
