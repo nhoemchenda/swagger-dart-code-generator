@@ -603,20 +603,39 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
 
     //Kyuthanea: Version 2.0 BS
     parameters.where((swaggerParameter) => swaggerParameter.inParameter == kFormData).forEach((swaggerParameter) {
-      print("swaggerParameter.type ${swaggerParameter.type}");
-      result.add(
-        Parameter(
-          (p) => p
-            ..name = swaggerParameter.name
-            ..named = true
-            ..required = true
-            ..type = Reference(
-                // isRequired ? 'List<int>' : 'List<int>?',
-                // isRequired ? 'List<PartValueFile>' : 'List<PartValueFile>?',
-                'List<MultipartFile>')
-            ..annotations.add(Reference("Part('${swaggerParameter.name}${swaggerParameter.type == "array" ? '[]' : ''}')")),
-        ),
-      );
+      // print("swaggerParameter.type ${swaggerParameter.type}");
+      if (swaggerParameter.type == "file") {
+        result.add(
+          Parameter(
+            (p) => p
+              ..name = swaggerParameter.name
+              ..named = true
+              ..required = true
+              ..type = Reference('List<MultipartFile>')
+              ..annotations.add(Reference("Part('${swaggerParameter.name}${swaggerParameter.type == "array" ? '[]' : ''}')")),
+          ),
+        );
+      } else {
+        result.add(
+          Parameter(
+            (p) => p
+              ..name = swaggerParameter.name
+              ..named = true
+              ..required = true
+              ..type = Reference(
+                _getParameterTypeName(
+                  parameter: swaggerParameter,
+                  path: path,
+                  requestType: requestType,
+                  definedParameters: definedParameters,
+                  modelPostfix: modelPostfix,
+                  root: root,
+                ).makeNullable(),
+              )
+              ..annotations.add(Reference("Part('${swaggerParameter.name}${swaggerParameter.type == "array" ? '[]' : ''}')")),
+          ),
+        );
+      }
     });
 
     final requestBody = swaggerRequest.requestBody;
