@@ -433,7 +433,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
         return refer(kBody.pascalCase).call([]);
       default:
         //https://github.com/lejard-h/chopper/issues/295
-        return refer(parameter.inParameter.pascalCase).call([literalString(parameter.name.replaceAll('\$', ''))]);
+        return refer(parameter.inParameter.pascalCase).call([literalString('${parameter.name.replaceAll('\$', '')}${(parameter.type == "array" || parameter.schema?.type == "array") ? '[]' : ''}')]);
     }
   }
 
@@ -571,35 +571,31 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
       ...additionalHeaders,
     ].map((par) => definedParameters[par.ref.split('/').last] ?? par).toList();
 
-    final result = parameters
-        .where((swaggerParameter) => ignoreHeaders ? swaggerParameter.inParameter != kHeader : true)
-        .where((swaggerParameter) => swaggerParameter.inParameter != kCookie)
-        .where((swaggerParameter) => swaggerParameter.inParameter.isNotEmpty)
-        .where((swaggerParameter) => swaggerParameter.inParameter != kFormData)
-        .map(
-          (swaggerParameter) => Parameter(
-            (p) => p
-              ..name = swaggerParameter.name.asParameterName()
-              ..named = true
-              ..required = swaggerParameter.isRequired && _getHeaderDefaultValue(swaggerParameter) == null && swaggerParameter.inParameter != kHeader
-              ..type = Reference(
-                _getParameterTypeName(
-                  parameter: swaggerParameter,
-                  path: path,
-                  requestType: requestType,
-                  definedParameters: definedParameters,
-                  modelPostfix: modelPostfix,
-                  root: root,
-                ).makeNullable(),
-              )
-              ..named = true
-              ..annotations.add(
-                _getParameterAnnotation(swaggerParameter),
-              )
-              ..defaultTo = _getHeaderDefaultValue(swaggerParameter) ?? (swaggerParameter.schema?.defaultValue == null ? null : Code(swaggerParameter.schema?.type == "string" ? "'${swaggerParameter.schema?.defaultValue?.toString()}'" : "${swaggerParameter.schema?.defaultValue?.toString()}")),
-          ),
-        )
-        .toList();
+    final result = parameters.where((swaggerParameter) => ignoreHeaders ? swaggerParameter.inParameter != kHeader : true).where((swaggerParameter) => swaggerParameter.inParameter != kCookie).where((swaggerParameter) => swaggerParameter.inParameter.isNotEmpty).where((swaggerParameter) => swaggerParameter.inParameter != kFormData).map(
+      (swaggerParameter) {
+        return Parameter(
+          (p) => p
+            ..name = swaggerParameter.name.asParameterName()
+            ..named = true
+            ..required = swaggerParameter.isRequired && _getHeaderDefaultValue(swaggerParameter) == null && swaggerParameter.inParameter != kHeader
+            ..type = Reference(
+              _getParameterTypeName(
+                parameter: swaggerParameter,
+                path: path,
+                requestType: requestType,
+                definedParameters: definedParameters,
+                modelPostfix: modelPostfix,
+                root: root,
+              ).makeNullable(),
+            )
+            ..named = true
+            ..annotations.add(
+              _getParameterAnnotation(swaggerParameter),
+            )
+            ..defaultTo = _getHeaderDefaultValue(swaggerParameter) ?? (swaggerParameter.schema?.defaultValue == null ? null : Code(swaggerParameter.schema?.type == "string" ? "'${swaggerParameter.schema?.defaultValue?.toString()}'" : "${swaggerParameter.schema?.defaultValue?.toString()}")),
+        );
+      },
+    ).toList();
 
     //Kyuthanea: Version 2.0 BS
     parameters.where((swaggerParameter) => swaggerParameter.inParameter == kFormData).forEach((swaggerParameter) {

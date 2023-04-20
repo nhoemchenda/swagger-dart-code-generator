@@ -29,12 +29,11 @@ extension TypeExtension on String {
 
   String getUnformattedRef() => split('/').last;
 
-  String withPostfix(String postfix) => '${this}$postfix';
+  String withPostfix(String postfix) => '$this$postfix';
 
   String asList() => 'List<$this>';
 
-  String removeListOrStream() =>
-      replaceAll('List<', '').replaceAll('Stream<', '').replaceAll('>', '');
+  String removeListOrStream() => replaceAll('List<', '').replaceAll('Stream<', '').replaceAll('>', '');
 
   String asEnum() => 'enums.$this';
 
@@ -49,8 +48,7 @@ extension TypeExtension on String {
       return kDynamic;
     }
 
-    final result =
-        split('-').map((String str) => str == str.capitalize).toList().join();
+    final result = split('-').map((String str) => str == str.capitalize).toList().join();
 
     return result;
   }
