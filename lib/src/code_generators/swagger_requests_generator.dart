@@ -93,6 +93,12 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
             ..type = Reference('Iterable<dynamic>?')
             ..name = 'interceptors',
         ))
+        ..optionalParameters.add(Parameter(
+          (p) => p
+            ..named = true
+            ..type = Reference('Client?')
+            ..name = 'httpClient',
+        ))
         ..body = Code(body),
     );
   }
@@ -1075,6 +1081,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
 
     final newClient = ChopperClient(
       services: [_\$$className()],
+      client: httpClient,
       $converterString
       interceptors: interceptors ?? [],
       authenticator: authenticator,

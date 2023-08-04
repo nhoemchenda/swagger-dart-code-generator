@@ -65,7 +65,7 @@ import 'package:chopper/chopper.dart' as chopper;''';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:collection/collection.dart';
-import 'package:http/http.dart' show MultipartFile;
+import 'package:http/http.dart' show MultipartFile, Client;
 ${options.overrideToString ? "import 'dart:convert';" : ''}
 """);
     }
