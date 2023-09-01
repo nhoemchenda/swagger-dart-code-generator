@@ -99,6 +99,12 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
             ..type = Reference('Client?')
             ..name = 'httpClient',
         ))
+        ..optionalParameters.add(Parameter(
+          (p) => p
+            ..named = true
+            ..type = Reference('Converter?')
+            ..name = 'chopperConverter',
+        ))
         ..body = Code(body),
     );
   }
@@ -1072,7 +1078,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
   ) {
     final baseUrlString = options.withBaseUrl ? "baseUrl:  baseUrl ?? Uri.parse('http://$host$basePath')" : '/*baseUrl: YOUR_BASE_URL*/';
 
-    final converterString = options.withConverter ? 'converter: \$JsonSerializableConverter(),' : 'converter: chopper.JsonConverter(),';
+    final converterString = options.withConverter ? 'converter: chopperConverter ?? \$JsonSerializableConverter(),' : 'converter: chopperConverter ?? chopper.JsonConverter(),';
 
     final chopperClientBody = '''
     if(client!=null){
