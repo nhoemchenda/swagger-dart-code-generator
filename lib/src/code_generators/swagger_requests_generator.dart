@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:recase/recase.dart';
 import 'package:swagger_dart_code_generator/src/code_generators/swagger_generator_base.dart';
 import 'package:swagger_dart_code_generator/src/code_generators/swagger_models_generator.dart';
+import 'package:swagger_dart_code_generator/src/extensions/file_name_extensions.dart';
 import 'package:swagger_dart_code_generator/src/extensions/parameter_extensions.dart';
 import 'package:swagger_dart_code_generator/src/extensions/string_extension.dart';
 import 'package:swagger_dart_code_generator/src/models/generator_options.dart';
@@ -261,7 +262,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
     }
 
     //Models from response
-    final successResponse = getSuccessedResponse(responses: request.responses);
+    final successResponse = getSucceedResponse(responses: request.responses);
     final responseRef = successResponse?.anyRef ?? '';
 
     if (responseRef.isNotEmpty) {
@@ -589,7 +590,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
           (p) => p
             ..name = swaggerParameter.name.asParameterName()
             ..named = true
-            ..required = swaggerParameter.isRequired && _getHeaderDefaultValue(swaggerParameter) == null && swaggerParameter.inParameter != kHeader
+            ..required = swaggerParameter.isRequired && _getHeaderDefaultValue(swaggerParameter) == null && swaggerParameter.inParameter != kHeader && (_getHeaderDefaultValue(swaggerParameter) ?? (swaggerParameter.schema?.defaultValue == null ? null : Code(swaggerParameter.schema?.type == "string" ? "'${swaggerParameter.schema?.defaultValue?.toString()}'" : "${swaggerParameter.schema?.defaultValue?.toString()}"))) == null
             ..type = Reference(
               _getParameterTypeName(
                 parameter: swaggerParameter,
@@ -843,13 +844,13 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
     if (options.usePathForRequestNames || swaggerRequest.operationId.isEmpty) {
       methodName = generateRequestName(path, requestType);
     } else {
-      methodName = swaggerRequest.operationId;
+      methodName = getClassNameFromFileName(swaggerRequest.operationId);
     }
 
     return methodName;
   }
 
-  static SwaggerResponse? getSuccessedResponse({
+  static SwaggerResponse? getSucceedResponse({
     required Map<String, SwaggerResponse> responses,
   }) {
     return responses.entries.firstWhereOrNull((responseEntry) => successResponseCodes.contains(responseEntry.key) || successDescriptions.contains(responseEntry.value.description))?.value;
@@ -1038,7 +1039,7 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
       return overridenResponses[path]!.overriddenValue;
     }
 
-    final neededResponse = getSuccessedResponse(
+    final neededResponse = getSucceedResponse(
       responses: responses,
     );
 
