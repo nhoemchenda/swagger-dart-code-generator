@@ -845,9 +845,14 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
       methodName = generateRequestName(path, requestType);
     } else {
       methodName = getClassNameFromFileName(swaggerRequest.operationId);
+
+      if (!methodName.startsWith("post") && !methodName.startsWith("request") && !methodName.startsWith("get")) {
+        String prefix = requestType == "post" ? "request" : requestType;
+        methodName = prefix + methodName.pascalCase;
+      }
     }
 
-    return methodName;
+    return methodName.camelCase;
   }
 
   static SwaggerResponse? getSucceedResponse({
