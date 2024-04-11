@@ -53,7 +53,7 @@ class SwaggerAdditionsGenerator extends SwaggerGeneratorBase {
 
 import 'client_mapping.dart';
 import 'dart:async';
-import 'package:http/http.dart';
+import 'package:http/http.dart' hide Response, Request;
 import 'package:chopper/chopper.dart' as chopper;''';
 
     final enumsImport = hasEnums ? "import '$swaggerFileName.enums.swagger.dart' as enums;" : '';
